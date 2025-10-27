@@ -1,0 +1,75 @@
+@model BancomatApp.Models.PrelievoViewModel
+
+@{
+    ViewData["Title"] = "Bancomat - Selezione Importo";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>BANCOMAT</h3>
+                    <p class="mb-0">Seleziona l'importo da prelevare</p>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["Errore"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["Errore"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="alert alert-info text-center mb-4">
+                        <h5 class="mb-0">
+                            <i class="bi bi-wallet2"></i>
+                            Saldo disponibile: <strong>@Model.SaldoAttuale.ToString("C")</strong>
+                        </h5>
+                    </div>
+
+                    <form asp-action="Preleva" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">Importi predefiniti:</h5>
+                            <div class="row g-3">
+                                @foreach (var importo in Model.ImportiDisponibili)
+                                {
+                                    <div class="col-6 col-md-4">
+                                        <button type="submit" name="importoSelezionato" value="@importo"
+                                                class="btn btn-outline-primary btn-lg w-100"
+                                                @(importo > Model.SaldoAttuale ? "disabled" : "")>
+                                            @importo.ToString("C")
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">Oppure inserisci un importo personalizzato:</h5>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">€</span>
+                                <input type="number" name="importoCustom" class="form-control"
+                                       placeholder="Inserisci importo" min="10" max="@Model.SaldoAttuale" step="10" />
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-cash"></i> Preleva
+                                </button>
+                            </div>
+                            <small class="text-muted">Importo minimo: 10€ - Massimo: @Model.SaldoAttuale.ToString("C")</small>
+                        </div>
+                    </form>
+
+                    <div class="d-grid mt-4">
+                        <a asp-action="Login" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annulla
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
